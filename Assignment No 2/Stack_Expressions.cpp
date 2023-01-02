@@ -1,4 +1,5 @@
 #include<iostream>
+#include<string>
 using namespace std;
 
 /*
@@ -172,7 +173,6 @@ int Prec(char val)
 
 
 /*
-
 char* InfixToPostfix(char Infix[],char Postfix[]) -- This method converts infix to postfix.
 
 I.Create Top pointer to use it in stack and s reference variable to acess methods of stack.
@@ -194,7 +194,7 @@ IV.after end add '\0' to mark end os array .
 
 V.return postfix expression.
 */
-char* InfixToPostfix(char Infix[],char Postfix[])
+void InfixToPostfix(char Infix[],char Postfix[])
 {
     Node* Top = NULL ;
     Stack s;
@@ -210,7 +210,7 @@ char* InfixToPostfix(char Infix[],char Postfix[])
         }
         else
         {
-            if (Prec(Infix[i]) > Prec(s.top(Top)))
+            if(Prec(Infix[i]) > Prec(s.top(Top)))
             {
                 s.push(Top,Infix[i]);
                 i++ ; 
@@ -229,11 +229,10 @@ char* InfixToPostfix(char Infix[],char Postfix[])
         j++ ;
     }
 
-    Postfix[j] = '\0' ;
-    return Postfix ; 
+    Postfix[j] = '\0' ; 
 }
 
-char* InfixToPrefix(char Infix[],char Prefix[],int size)
+void InfixToPrefix(char Infix[],char Prefix[],int size)
 {
     Node *Top = NULL ;
     Stack s ;
@@ -266,7 +265,7 @@ char* InfixToPrefix(char Infix[],char Prefix[],int size)
 
     while(s.isempty(Top) == false)
     {
-        Data[j] = s.pop(Top) ;
+        Data[j] = s.pop(Top) ; 
         j++ ;
     }
     Data[j] = '\0' ;
@@ -279,7 +278,52 @@ char* InfixToPrefix(char Infix[],char Prefix[],int size)
     }
 
     Prefix[j] = '\0' ;
-    return Prefix ;
+}
+
+int evaluatePostfix(int postfix[])
+{
+    Node *Top = NULL ;
+    int op1 , op2 ;
+    int result ;
+    Stack s ;
+    
+    for(int i = 0 ; postfix[i] != '\0' ; i++)
+    {
+        if(isdigit(postfix[i]))
+        {
+            s.push(Top,postfix[i]);
+        }
+        else
+        {
+            op1 = s.pop(Top);
+            op2 = s.pop(Top);
+            switch (postfix[i])
+            {
+            case '+':
+                result = op1+op2;
+                s.push(Top,result) ;
+                break;
+
+            case '-':
+                result = op1-op2;
+                s.push(Top,result) ;
+                break;
+
+            case '*':
+                result = op1*op2;
+                s.push(Top,result) ;
+                break;
+
+            case '/':
+                result = op1/op2;
+                s.push(Top,result) ;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    return s.pop(Top) ;
 }
 
 int main()
@@ -287,14 +331,20 @@ int main()
     char* Postfix ;
     char* infix ;
     char* Prefix ;
+    int* postfix ;
+    int* prefix ;
     int choice = -1 ;
     int size ;
     int j = 0;
-    string Data;
+    string Data ;
+    int result ;
     
     do
     {
         cout<<"1.Infix TO Postfix"<<endl ;
+        cout<<"2.Infix TO Prefix"<<endl ;
+        cout<<"3.Evaluate Postfix"<<endl ;
+        cout<<"4.Evaluate Prefix"<<endl ;
         cin >>choice ;
         cout<<"\n" ; 
         switch (choice)
@@ -311,7 +361,9 @@ int main()
 
             size = sizeof(infix)/sizeof(infix[0]) ;
             Postfix = new char[size] ;
-            cout << "Postfix Expression is: "<< InfixToPostfix(infix,Postfix) << endl;
+            InfixToPostfix(infix,Postfix) ;
+
+            cout << "Postfix Expression is: "<< Postfix << endl;
             break;
 
         case 2:
@@ -328,15 +380,28 @@ int main()
 
             size = sizeof(infix)/sizeof(infix[0]) ;
             Prefix = new char[size] ;
-            cout << "Prefix Expression is: "<< InfixToPrefix(infix,Prefix,size) << endl;
+            InfixToPrefix(infix,Prefix,size) ;
+            cout << "Prefix Expression is: "<< Prefix << endl;
             break ;
 
         case 3:
+            
+            cout<<"Enter Postfix Expression: ";
+            cin >>Data;
+            postfix = new int[Data.length()+1] ;
+            for(int i = 0 ; i < Data.length() ; i++)
+            {
+                postfix[i] = Data[i] ;
+            }
+            postfix[Data.length()] = '\0' ;
 
+            result = evaluatePostfix(postfix) ;
+            cout << "Result of Expression: " << result << endl;
+            cout<<"\n" ; 
             break;
 
         case 4:
-
+            cout<<"\n" ; 
             break ;
         default:
             break;
